@@ -24,10 +24,11 @@ void double_val(void *vargp)
 {
     struct slice* section = (struct slice*) vargp;
     
-    for (int i = slice->start; i < slice->end; ++i)
+    for (int i = section->start; i < section->end; ++i)
     {
         NUMS[i] *= 2;
     }
+    free(vargp);
 }
 
 
@@ -51,7 +52,11 @@ void demo(int tcount)
         {
             end = 99;
         }
-        struct slice * section = {start, end};
+        struct slice * section;
+        section = (struct slice*) malloc(sizeof(struct slice));
+        section->start = start;
+        section->end = end;
+
         pthread_t tid;
         threads[i] = tid;
         pthread_create(&tid, NULL, double_val, (void *)slice);
