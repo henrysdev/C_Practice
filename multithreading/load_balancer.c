@@ -20,7 +20,7 @@ void print_arr()
 }
 
 
-void double_val(void *vargp)
+void *double_val(void *vargp)
 {
     struct slice* section = (struct slice*) vargp;
     
@@ -28,7 +28,7 @@ void double_val(void *vargp)
     {
         NUMS[i] *= 2;
     }
-    free(vargp);
+    free(section);
 }
 
 
