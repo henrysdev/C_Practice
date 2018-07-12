@@ -76,6 +76,7 @@ void demo(int tcount)
 
     for (int i = 0; i < tcount; ++i)
     {
+        //printf("threads[i]:%lu\n", threads[i]);
         pthread_join(threads[i], NULL);
     }
     
