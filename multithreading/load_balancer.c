@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-int NUMS[100];
+#define SIZE 100
+int NUMS[SIZE];
 
 
 struct slice
@@ -13,59 +14,71 @@ struct slice
 
 void print_arr()
 {
-    for (int i = 0; i < 100; ++i)
+    printf("\n");
+    for (int i = 0; i < SIZE-1; ++i)
     {
-        printf("%d\n", NUMS[i]);
+        printf("%d, ", NUMS[i]);
     }
+    printf("%d\n\n", NUMS[SIZE-1]);
 }
 
 
 void *double_val(void *vargp)
 {
-    struct slice* section = (struct slice*) vargp;
+    struct slice *section = (struct slice*) vargp;
     
-    for (int i = section->start; i < section->end; ++i)
+    for (int i = (*section).start; i <= (*section).end; ++i)
     {
         NUMS[i] *= 2;
     }
     free(section);
+    pthread_exit((void*)vargp);
 }
 
 
 void demo(int tcount)
 {
     /* initialize random values for array */
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < SIZE; ++i)
     {
-        NUMS[i] = rand() % 100;
+        NUMS[i] = rand() % SIZE;
     }
     print_arr();
 
     pthread_t threads[tcount];
 
-    int slice = 100 / tcount;
+    struct slice *section;
+    int arrslice = SIZE / tcount;
+    int rem = SIZE % tcount;
+    int lastend = 0;
+
     for (int i = 0; i < tcount; ++i)
     {
-        int start = i * slice;
-        int end = start + slice;
-        if (i == tcount - 1)
+        int start = lastend;
+        int end = start + arrslice - 1;
+
+        if (tcount - i <= rem)
         {
-            end = 99;
+            end += 1;
         }
-        struct slice * section;
-        section = (struct slice*) malloc(sizeof(struct slice));
-        section->start = start;
-        section->end = end;
+
+        lastend = end + 1;
+    
+        section = malloc(sizeof(struct slice));
+        (*section).start = start;
+        (*section).end = end;
 
         pthread_t tid;
         threads[i] = tid;
-        pthread_create(&tid, NULL, double_val, (void *)slice);
+        printf("start: %d, end: %d\n", start, end);
+        pthread_create(&tid, NULL, double_val, (void *)section);
     }
 
     for (int i = 0; i < tcount; ++i)
     {
         pthread_join(threads[i], NULL);
     }
+    
     print_arr();
 }
 
@@ -75,8 +88,9 @@ int main(int argc, char** argv)
     int tcount = 4;
     if (argc > 1)
     {
-        tcount = atoi(argv[1]);
+        tcount = strtol(argv[1], NULL, 10);
     }
+    printf("tcount: %d\n", tcount);
 
     demo(tcount);
     
