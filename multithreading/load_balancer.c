@@ -39,9 +39,9 @@ void *double_val(void *vargp)
 void demo(int tcount)
 {
     /* initialize random values for array */
-    for (int i = 0; i < SIZE; ++i)
+    for (int n = 0; n < SIZE; ++n)
     {
-        NUMS[i] = rand() % SIZE;
+        NUMS[n] = rand() % SIZE;
     }
     print_arr();
 
@@ -52,12 +52,13 @@ void demo(int tcount)
     int rem = SIZE % tcount;
     int lastend = 0;
 
-    for (int i = 0; i < tcount; ++i)
+    /* iterate through threads and distribute work evenly */
+    for (int t = 0; t < tcount; ++t)
     {
         int start = lastend;
         int end = start + arrslice - 1;
 
-        if (tcount - i <= rem)
+        if (tcount - t <= rem)
         {
             end += 1;
         }
@@ -69,15 +70,15 @@ void demo(int tcount)
         (*section).end = end;
 
         pthread_t tid;
-        threads[i] = tid;
+        threads[t] = tid;
         printf("start: %d, end: %d\n", start, end);
         pthread_create(&tid, NULL, double_val, (void *)section);
     }
 
-    for (int i = 0; i < tcount; ++i)
+    /* join all threads */
+    for (int j = 0; j < tcount; ++j)
     {
-        //printf("threads[i]:%lu\n", threads[i]);
-        pthread_join(threads[i], NULL);
+        pthread_join(threads[j], NULL);
     }
     
     print_arr();
