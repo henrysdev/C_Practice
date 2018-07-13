@@ -5,8 +5,12 @@
 #define SIZE 100
 int NUMS[SIZE];
 
-// rm output.log; for ((i=1; i < 26; i++)); do for ((n=1; n < 5; n++)); do (./OUT $i) >> output.log; done; done; vim output.log
-//
+/* Use the following bash command to run 5 trials foreach thread count from 1-25 for analyzing thread ordering
+ * 
+ * rm output.log; for ((i=1; i < 26; i++)); do for ((n=1; n < 5; n++)); do (./OUT $i) >> output.log; done; done; vim output.log
+ *
+ */
+
 struct slice
 {
     int start, end;
