@@ -5,7 +5,8 @@
 #define SIZE 100
 int NUMS[SIZE];
 
-
+// rm output.log; for ((i=1; i < 26; i++)); do for ((n=1; n < 5; n++)); do (./OUT $i) >> output.log; done; done; vim output.log
+//
 struct slice
 {
     int start, end;
@@ -32,6 +33,7 @@ void *double_val(void *vargp)
         NUMS[i] *= 2;
     }
     free(section);
+
     pthread_exit((void*)vargp);
 }
 
@@ -71,14 +73,15 @@ void demo(int tcount)
 
         pthread_t tid;
         threads[t] = tid;
-        printf("start: %d, end: %d\n", start, end);
+        printf("thread_id: %lu, start: %d, end: %d\n", tid, start, end);
         pthread_create(&tid, NULL, double_val, (void *)section);
     }
 
     /* join all threads */
-    for (int j = 0; j < tcount; ++j)
+    for (int t = 0; t < tcount; ++t)
     {
-        pthread_join(threads[j], NULL);
+        printf("joining thread: %lu\n", threads[t]);
+        pthread_join(threads[t], NULL);
     }
     
     print_arr();
@@ -92,7 +95,8 @@ int main(int argc, char** argv)
     {
         tcount = strtol(argv[1], NULL, 10);
     }
-    printf("tcount: %d\n", tcount);
+    printf("-------------------------------------------\n"
+           "tcount: %d\n", tcount);
 
     demo(tcount);
     
